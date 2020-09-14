@@ -49,7 +49,8 @@ function setupSquares() {
     for(var i=0; i<squares.length; i++) {
         //assign colors to squares
         squares[i].style.backgroundColor = colors[i];
-        console.log("Square " + i + " is colour: " + colors[i])
+        console.log("Colour " + i + " is: " + colors[i]);
+        console.log("Square " + i + " has color: " + squares[i].style.backgroundColor);
         //assign click selectors to squares
         squares[i].addEventListener("click", function(){
             //compare clicked color to pickedColor
@@ -74,7 +75,6 @@ function reset() {
         colors = randColorsEasy(numSquares);
     }
     pickedColor = pickColor();
-    console.log("Picked colour is " + pickedColor);
     colorDisplay.textContent = pickedColor;
     for(var i=0; i<squares.length; i++) {
         squares[i].style.display = "block";
@@ -97,32 +97,37 @@ function changeColors(color) {
 
 function pickColor() {
     var random = Math.floor(Math.random() * colors.length);
-    console.log("picked colour: " + random)
     return colors[random];
 }
 
 function randomColorsHard(num){
-    // 256 (the highest value for RGB) is divided into ten segments – 1-25, 26–50, etc. For hard colours, the programme randomly selects a segment, and then picks random numbers from within that segment for all of the colours. This means there is a much narrower range that colours can be selected from.
+    // In hard mode, the programme divides numbers between 1 and 255 into four segments (i.e. 0–63, 64–128, 129–192, 193–255). It then creates a random array containing numbers one to four, and pops these off of the random array. The three numbers for each colour code are then generated from these numbers in that order. For example, if the selection is [2, 1, 4], the colors chosen will be within the ranges rgb(64–128, 1–63, 193–255).
+    z = 255/4;
+    segments = rand_arr(4);
+    console.log("segment list is: " + segments)
+    selection = [];
+    for(var i=0; i<3; i++) {
+        selection.push(segments.pop())
+    }
     colors = [];
-    z = 256/6;
-    x = Math.floor(Math.random() * 6);
-    for(var i=0; i<num; i++){
+    for(var i=0; i<num; i++) {
         arr = [];
         for(var j=0; j<3; j++) {
-            y = Math.floor(Math.random() * 256/6);
-            n = Math.floor(z*x + y);
+            y = Math.floor(Math.random() * z);
+            n = Math.floor(z*selection[j] + y);
+            console.log(n)
             arr.push(n);
         }
         colors.push("rgb(" + arr[0] + ", " + arr[1] + ", " + arr[2] + ")");
     }
-    console.log("The colors are: " + colors);
+    console.log("The colors are: " + colors)
     return colors
 }
 
 function randColorsEasy(num) {
-    // For easy colours, the programme generates an array containing numbers 1 to 18 in a random order. It then pops the next number off the array each time it generates a new color, so each color code is from a different segment of 256.
-    z = 256/18;
-    segments = rand_arr();
+    // In easy mode, the programme divides 255 by 18 and generates an array containing numbers 1 to 18 in a random order. It then pops the next number off the array each time it generates a new color, so each color code is from a different segment of 255.
+    z = 255/18;
+    segments = rand_arr(18);
     colors = [];
     for(var j=0; j<num; j++){
         arr = []
@@ -138,13 +143,13 @@ function randColorsEasy(num) {
     return colors
 }
 
-function rand_arr() {
+function rand_arr(num) {
     segments = [];
-    for(var i=1; i<19; i++) {
+    for(var i=0; i<num; i++) {
         segments.push(i);
     }
     segments_rand = []
-    for(var i = 0; i<18; i++) {
+    for(var i = 0; i<num; i++) {
         v = Math.floor(Math.random() * segments.length);
         y = segments[v];
         segments_rand.push(y)
